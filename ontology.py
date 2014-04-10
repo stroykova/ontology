@@ -3,6 +3,68 @@ import os
 from elementtree import ElementTree
 
 
+def get_articles(category, in_dir):
+    articles = []
+    categories = set()
+    idx = 0
+    files = os.listdir(in_dir)
+    for idx_f, file_name in enumerate(files):
+        print idx_f + 1, "/", len(files)
+        source = open(in_dir + '/' + file_name)
+        context = ElementTree.iterparse(source, events=("start", "end"))
+        context = iter(context)
+        event, root = context.next()
+
+        for event, elem in context:
+            tag = elem.tag.split('}')[1]
+            if event == "end" and tag == "text":
+                if not elem.text:
+                    continue
+
+                start = elem.text.find("{{", )
+                end = elem.text.find("}}")
+                if start != -1 and end != -1:
+                    parts = elem.text[start+2:end].lower().split('|')
+                    text_c = parts[0].encode('utf-8')
+
+                    if text_c.startswith(category):
+                        articles.append(elem.text.encode('utf-8'))
+                    categories.add(text_c)
+
+                root.clear()
+                if idx % 1000 == 0:
+                    print idx
+                idx += 1
+
+    f = open("categories", "w")
+    for c in categories:
+        f.write(c + "\n")
+    f.close()
+    return articles
+
+
+def print_articles(articles):
+    f = open("articles", "w")
+    for a in articles:
+        parts = a.split("}}")
+        if not parts:
+            continue
+
+        short = parts[0]
+        short = short.replace("{{", "")
+        short = short.replace("}}", "")
+
+        pairs = short.split("|")
+        for pair in pairs:
+            if not "=" in pair:
+                f.write(pair)
+                continue
+            tuple = pair.split("=")
+            f.write(tuple[0]+"\n")
+            f.write(tuple[1]+"\n")
+    f.close()
+
+
 def main():
     args_count = len(sys.argv)
     if args_count < 3:
@@ -17,56 +79,12 @@ def main():
     category = f.readline().rstrip('\n')
 
     print "Category: " + category
-    files = os.listdir(in_dir)
 
-    categories = set()
-    articles = []
+    articles = get_articles(category, in_dir)
 
-    for idx, file_name in enumerate(files):
-        print idx + 1, "/", len(files)
-        source = open(in_dir + '/' + file_name)
-        context = ElementTree.iterparse(source, events=("start", "end"))
-        context = iter(context)
-        event, root = context.next()
-        idx = 0
-        for event, elem in context:
-            tag = elem.tag.split('}')[1]
-            if event == "end" and tag == "text":
-                if not elem.text:
-                    continue
+    print_articles(articles)
 
-                start = elem.text.find("{{", )
-                end = elem.text.find("}}")
-                if start != -1 and end != -1:
-                    # print elem.text[start+2:end].split('|')[0], "\n"
-                    parts = elem.text[start+2:end].lower().split('|')
-                    text_c = parts[0].encode('utf-8')
-
-                    if text_c.startswith(category):
-                        # print(elem.text)
-                        articles.append(elem.text.encode('utf-8'))
-                    categories.add(text_c)
-
-                root.clear()
-                if idx % 1000 == 0:
-                    print idx
-                idx += 1
-
-                # if idx > 200000:
-                #     break
-
-    f = open("categories", "w")
-    for c in categories:
-        f.write(c + "\n")
-    f.close()
-
-    f = open("articles", "w")
-    for a in articles:
-        f.write(a + "\n\n")
-    f.close()
-
-    print idx
-    print len(articles)
+    print "articles in category:", len(articles)
 
     return
 
