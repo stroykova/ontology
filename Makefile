@@ -1,5 +1,8 @@
-run:
+build:
 	python ontology.py docs category
+
+parse:
+	python parse_article.py ontology article
 
 clean:
 	find . -name \*~ -delete

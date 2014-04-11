@@ -44,7 +44,7 @@ def get_articles(category, in_dir):
 
 
 def print_articles(articles):
-    f = open("articles", "w")
+    f = open("ontology", "w")
     for a in articles:
         parts = a.split("}}")
         if not parts:
