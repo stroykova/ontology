@@ -55,13 +55,16 @@ def print_articles(articles):
         short = short.replace("}}", "")
 
         pairs = short.split("|")
+        f.write("article\n")
         for pair in pairs:
             if not "=" in pair:
-                f.write(pair)
                 continue
             tuple = pair.split("=")
-            f.write(tuple[0]+"\n")
-            f.write(tuple[1]+"\n")
+            if len(tuple) < 2 or tuple[1].isspace():
+                continue
+
+            f.write(tuple[0].strip()+"\n")
+            f.write(tuple[1].strip()+"\n")
     f.close()
 
 
