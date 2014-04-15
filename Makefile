@@ -2,7 +2,7 @@ build:
 	python ontology.py docs category
 
 parse:
-	python parse_article.py ontology tomita/output.txt
+	python parse_article.py ontology tomita/output.txt output
 
 clean:
 	find . -name \*~ -delete

@@ -55,23 +55,31 @@ def search_by_value(ontology, query):
 
 def main():
     args_count = len(sys.argv)
-    if args_count < 3:
+    if args_count < 4:
         print "First command line argument must be ontology file name"
         print "Second command line argument must be article tomita output file name"
+        print "Third command line argument must be output directory"
         return 0
 	
     ontology_file = sys.argv[1]
     article_file = sys.argv[2]
+    directory = sys.argv[3]
+	
+    import shutil
+    shutil.rmtree(directory, True)
+    import os
+    os.makedirs(directory)
+	
     ontology = read_ontology(ontology_file)
     facts = get_facts(article_file)
-    output = open("output", 'w')
+    
     for fact in facts:
-		item = search_by_value(ontology, fact.encode('utf-8').lower())
-		if item:
-		    for k, v in item.items():
-				output.write(k + " " + v + "\n")
-
-    output.close()
+        item = search_by_value(ontology, fact.encode('utf-8').lower())
+        if item:
+            output = open(directory + "/" + fact, 'w')
+            for k, v in item.items():
+                output.write(k + " " + v + "\n")
+            output.close()
     return
 
 
