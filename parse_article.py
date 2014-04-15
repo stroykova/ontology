@@ -1,4 +1,5 @@
 import sys
+from elementtree import ElementTree
 
 
 def read_ontology(file_name):
@@ -26,6 +27,24 @@ def read_ontology(file_name):
     return ontology
 
 
+def get_facts(article_file):
+	facts = []
+	source = open(article_file)
+	context = ElementTree.iterparse(source, events=("start", "end"))
+	context = iter(context)
+	event, root = context.next()
+	idx = 0
+	for event, elem in context:
+		if event == "end" and elem.tag == "Name":
+			if "val" in elem.attrib:
+				facts.append(elem.attrib["val"])
+			root.clear()
+			if idx % 10 == 0:
+				print idx
+			idx += 1
+	return facts		
+	
+
 def search_by_value(ontology, query):
     for item in ontology:
         for k, v in item.items():
@@ -38,15 +57,21 @@ def main():
     args_count = len(sys.argv)
     if args_count < 3:
         print "First command line argument must be ontology file name"
-        print "Second command line argument must be article file name"
+        print "Second command line argument must be article tomita output file name"
         return 0
+	
     ontology_file = sys.argv[1]
     article_file = sys.argv[2]
-
     ontology = read_ontology(ontology_file)
+    facts = get_facts(article_file)
+    output = open("output", 'w')
+    for fact in facts:
+		item = search_by_value(ontology, fact.encode('utf-8').lower())
+		if item:
+		    for k, v in item.items():
+				output.write(k + " " + v + "\n")
 
-    print(search_by_value(ontology, "Fate of Two Worlds"))
-
+    output.close()
     return
 
 

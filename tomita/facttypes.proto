@@ -1,0 +1,7 @@
+import "base.proto";           // подключаем описания protobuf-типов (TAuxDicArticle и прочих)
+import "articles_base.proto";  // Файлы base.proto и articles_base.proto встроены в компилятор.
+                               // Их необходимо включать в начало любого gzt-словаря.
+message Game: NFactType.TFact
+{
+	required string Name = 1;
+}
