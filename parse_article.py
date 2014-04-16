@@ -10,7 +10,6 @@ def read_ontology(file_name):
     odict = dict()
 
     i = 0
-    # while i + 1 < len(content):
     while i + 1 < len(content):
         if content[i].startswith("article"):
             if odict:
@@ -22,7 +21,7 @@ def read_ontology(file_name):
             i += 1
             continue
 
-        odict[content[i]] = content[i+1]
+        odict[content[i].lower()] = content[i+1].lower()
         i += 2
     return ontology
 
@@ -46,10 +45,11 @@ def get_facts(article_file):
 	
 
 def search_by_value(ontology, query):
+    print query
     for item in ontology:
-        for k, v in item.items():
-            if query in v:
-                return item
+        caption = item.itervalues().next()
+        if query in caption:
+            return item
     return None
 
 
