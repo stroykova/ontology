@@ -5,6 +5,8 @@ import "articles_base.proto";  // Файлы base.proto и articles_base.proto �
                                // Их необходимо включать в начало любого gzt-словаря.
 import "facttypes.proto";
 
+import "genre.gzt";
+
 // статья с нашей грамматикой:
 TAuxDicArticle "игра"
 {

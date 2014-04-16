@@ -4,4 +4,5 @@ import "articles_base.proto";  // Файлы base.proto и articles_base.proto встроен
 message Game: NFactType.TFact
 {
 	required string Name = 1;
+	optional string Genre = 2;
 }
